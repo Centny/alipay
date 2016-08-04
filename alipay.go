@@ -57,10 +57,10 @@ func (c *Client) Return(hs *routing.HTTPSession) routing.HResult {
 	data, _ = url.QueryUnescape(data)
 	var err = c.Web.Verify(data, sign, sign_type)
 	if err == nil {
-		log.D("Client.Return receive verify request and call on return by args:\n->\n%v\n<-", vals.Encode())
+		log.D("Client.Return receive verify request and call on return by args:\n%v\n<-", data)
 		return c.H.OnReturn(c, hs)
 	} else {
-		log.W("Client.Return recieve bad request from address(%v),err:%v->\n%v", addr, err, vals.Encode())
+		log.W("Client.Return recieve bad request from address(%v),err:%v->\n%v", addr, err, data)
 		hs.W.WriteHeader(400)
 		hs.W.Write([]byte(err.Error()))
 		return routing.HRES_RETURN
@@ -81,12 +81,12 @@ func (c *Client) Notify(hs *routing.HTTPSession) routing.HResult {
 	data, _ = url.QueryUnescape(data)
 	var err = c.Web.Verify(data, sign, sign_type)
 	if err != nil {
-		log.W("Client.Notify recieve bad request from address(%v),err:%v->\n%v", addr, err, vals.Encode())
+		log.W("Client.Notify recieve bad request from address(%v),err:%v->\n%v", addr, err, data)
 		hs.W.WriteHeader(400)
 		hs.W.Write([]byte(err.Error()))
 		return routing.HRES_RETURN
 	}
-	log.D("Client.Notify receive verify request from address(%v) by args:\n->\n%v\n<-", addr, vals.Encode())
+	log.D("Client.Notify receive verify request from address(%v) by args:\n%v\n<-", addr, data)
 	err = c.H.OnNotify(c, hs)
 	if err == nil {
 		hs.W.Write([]byte("success"))
