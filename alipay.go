@@ -22,7 +22,7 @@ func NewClient(gateway string, h Evh) *Client {
 	return &Client{Gateway: gateway, H: h}
 }
 
-func (c *Client) CreateWebUrl(notify_url, return_url, out_trade_no, subject, body string, total_fee float64) string {
+func (c *Client) CreateUrl(utype, notify_url, return_url, out_trade_no, subject, body string, total_fee float64) string {
 	var vals = &url.Values{}
 	vals.Add("service", "create_direct_pay_by_user")
 	vals.Add("partner", c.Web.Partner)
@@ -37,10 +37,18 @@ func (c *Client) CreateWebUrl(notify_url, return_url, out_trade_no, subject, bod
 	vals.Add("body", body)
 	var data = vals.Encode()
 	data, _ = url.QueryUnescape(data)
-	var sign = c.Web.Md5Sign(data)
-	vals.Add("sign_type", "MD5")
-	vals.Add("sign", sign)
-	return fmt.Sprintf("%v?%v", c.Gateway, vals.Encode())
+	switch utype {
+	case "APP":
+		var sign, _ = c.Web.ShaSign(data)
+		vals.Add("sign_type", "RSA")
+		vals.Add("sign", sign)
+		return vals.Encode()
+	default:
+		var sign = c.Web.Md5Sign(data)
+		vals.Add("sign_type", "MD5")
+		vals.Add("sign", sign)
+		return fmt.Sprintf("%v?%v", c.Gateway, vals.Encode())
+	}
 }
 
 func (c *Client) Return(hs *routing.HTTPSession) routing.HResult {
