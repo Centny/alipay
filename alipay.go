@@ -28,7 +28,9 @@ func (c *Client) CreateUrl(utype, notify_url, return_url, out_trade_no, subject,
 	vals.Add("partner", c.Web.Partner)
 	vals.Add("_input_charset", "utf-8")
 	vals.Add("notify_url", notify_url)
-	vals.Add("return_url", return_url)
+	if len(return_url) > 0 {
+		vals.Add("return_url", return_url)
+	}
 	vals.Add("out_trade_no", out_trade_no)
 	vals.Add("subject", subject)
 	vals.Add("payment_type", "1")
