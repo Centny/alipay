@@ -24,19 +24,33 @@ func NewClient(gateway string, h Evh) *Client {
 
 func (c *Client) CreateUrl(utype, notify_url, return_url, out_trade_no, subject, body string, total_fee float64) string {
 	var vals = &url.Values{}
-	vals.Add("service", "create_direct_pay_by_user")
-	vals.Add("partner", c.Web.Partner)
-	vals.Add("_input_charset", "utf-8")
-	vals.Add("notify_url", notify_url)
-	if len(return_url) > 0 {
-		vals.Add("return_url", return_url)
+	switch utype {
+	case "APP":
+		vals.Add("partner", fmt.Sprintf("\"%v\"", c.Web.Partner))
+		vals.Add("seller_id", fmt.Sprintf("\"%v\"", c.Web.Seller))
+		vals.Add("service", fmt.Sprintf("\"%v\"", "mobile.securitypay.pay"))
+		vals.Add("out_trade_no", fmt.Sprintf("\"%v\"", out_trade_no))
+		vals.Add("subject", fmt.Sprintf("\"%v\"", subject))
+		vals.Add("body", fmt.Sprintf("\"%v\"", body))
+		vals.Add("total_fee", fmt.Sprintf("\"%.02f\"", total_fee))
+		vals.Add("notify_url", fmt.Sprintf("\"%v\"", notify_url))
+		vals.Add("payment_type", "\"1\"")
+		vals.Add("_input_charset", "\"utf-8\"")
+	default:
+		vals.Add("_input_charset", "utf-8")
+		vals.Add("service", "create_direct_pay_by_user")
+		vals.Add("partner", c.Web.Partner)
+		vals.Add("notify_url", notify_url)
+		if len(return_url) > 0 {
+			vals.Add("return_url", return_url)
+		}
+		vals.Add("out_trade_no", out_trade_no)
+		vals.Add("subject", subject)
+		vals.Add("payment_type", "1")
+		vals.Add("total_fee", fmt.Sprintf("%.02f", total_fee))
+		vals.Add("seller_email", c.Web.Seller)
+		vals.Add("body", body)
 	}
-	vals.Add("out_trade_no", out_trade_no)
-	vals.Add("subject", subject)
-	vals.Add("payment_type", "1")
-	vals.Add("total_fee", fmt.Sprintf("%.02f", total_fee))
-	vals.Add("seller_email", c.Web.Seller)
-	vals.Add("body", body)
 	var data = vals.Encode()
 	data, _ = url.QueryUnescape(data)
 	switch utype {
