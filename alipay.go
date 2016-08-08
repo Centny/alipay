@@ -56,8 +56,8 @@ func (c *Client) CreateUrl(utype, notify_url, return_url, out_trade_no, subject,
 	switch utype {
 	case "APP":
 		var sign, _ = c.Web.ShaSign(data)
-		vals.Add("sign_type", "RSA")
-		vals.Add("sign", url.QueryEscape(sign))
+		vals.Add("sign_type", "\"RSA\"")
+		vals.Add("sign", fmt.Sprintf("\"%v\"", url.QueryEscape(sign)))
 		data, _ = url.QueryUnescape(vals.Encode())
 		return data
 	default:
