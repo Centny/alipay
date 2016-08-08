@@ -58,8 +58,8 @@ func (c *Client) CreateUrl(utype, notify_url, return_url, out_trade_no, subject,
 		var sign, _ = c.Web.ShaSign(data)
 		vals.Add("sign_type", "RSA")
 		vals.Add("sign", url.QueryEscape(sign))
-		// data, _ = url.QueryUnescape(vals.Encode())
-		return vals.Encode()
+		data, _ = url.QueryUnescape(vals.Encode())
+		return data
 	default:
 		var sign = c.Web.Md5Sign(data)
 		vals.Add("sign_type", "MD5")
