@@ -5,8 +5,8 @@ import (
 	"crypto/rsa"
 	"crypto/sha1"
 	"crypto/x509"
+	"encoding/base64"
 	"encoding/pem"
-	"fmt"
 	"github.com/Centny/gwf/util"
 )
 
@@ -67,7 +67,7 @@ func (c *Conf) ShaSign(data string) (string, error) {
 	hash.Write([]byte(data))
 	bys, err := rsa.SignPKCS1v15(nil, c.Private, crypto.SHA1, hash.Sum(nil))
 	if err == nil {
-		return fmt.Sprintf("%x", bys), nil
+		return base64.StdEncoding.EncodeToString(bys), nil
 	} else {
 		return "", err
 	}
