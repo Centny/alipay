@@ -69,6 +69,7 @@ func (c *Client) CreateUrl(utype, notify_url, return_url, out_trade_no, subject,
 }
 
 func (c *Client) Return(hs *routing.HTTPSession) routing.HResult {
+	log.D("Return->%v", "xxx")
 	var addr = hs.R.Header.Get("X-Real-IP")
 	if len(addr) < 1 {
 		addr = hs.R.RemoteAddr
@@ -85,7 +86,7 @@ func (c *Client) Return(hs *routing.HTTPSession) routing.HResult {
 		log.D("Client.Return receive verify request and call on return by args:\n%v\n<-", data)
 		return c.H.OnReturn(c, hs)
 	} else {
-		log.W("Client.Return recieve bad request from address(%v),err:%v->\n%v", addr, err, data)
+		log.W("Client.Notify recieve bad request from address(%v),err:%v->\nsign_type=%v&sign=%v&%v", addr, err, sign_type, sign, data)
 		hs.W.WriteHeader(400)
 		hs.W.Write([]byte(err.Error()))
 		return routing.HRES_RETURN
@@ -93,6 +94,7 @@ func (c *Client) Return(hs *routing.HTTPSession) routing.HResult {
 }
 
 func (c *Client) Notify(hs *routing.HTTPSession) routing.HResult {
+	log.D("Notify->%v", "xxx")
 	var addr = hs.R.Header.Get("X-Real-IP")
 	if len(addr) < 1 {
 		addr = hs.R.RemoteAddr
@@ -106,7 +108,7 @@ func (c *Client) Notify(hs *routing.HTTPSession) routing.HResult {
 	data, _ = url.QueryUnescape(data)
 	var err = c.Web.Verify(data, sign, sign_type)
 	if err != nil {
-		log.W("Client.Notify recieve bad request from address(%v),err:%v->\n%v", addr, err, data)
+		log.W("Client.Notify recieve bad request from address(%v),err:%v->\nsign_type=%v&sign=%v&%v", addr, err, sign_type, sign, data)
 		hs.W.WriteHeader(400)
 		hs.W.Write([]byte(err.Error()))
 		return routing.HRES_RETURN

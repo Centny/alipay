@@ -82,9 +82,13 @@ func (c *Conf) Md5Verify(data, sign string) error {
 }
 
 func (c *Conf) AlipayVerify(data, sign string) error {
+	var sigs_b, err = base64.StdEncoding.DecodeString(sign)
+	if err != nil {
+		return err
+	}
 	var hash = sha1.New()
 	hash.Write([]byte(data))
-	return rsa.VerifyPKCS1v15(c.Alipay, crypto.SHA1, hash.Sum(nil), []byte(sign))
+	return rsa.VerifyPKCS1v15(c.Alipay, crypto.SHA1, hash.Sum(nil), sigs_b)
 }
 
 func (c *Conf) Verify(data, sign, sign_type string) error {
